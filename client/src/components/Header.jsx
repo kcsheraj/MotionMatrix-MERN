@@ -10,9 +10,6 @@ export default function Header() {
           <h1 className="font-bold">MotionMatrix</h1>
         </Link>
         <ul className="flex gap-4">
-          <Link to="/">
-            <li>Home</li>
-          </Link>
           <Link to="/about">
             <li>About</li>
           </Link>
