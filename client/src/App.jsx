@@ -7,7 +7,7 @@ import Profile from "./pages/Profile";
 import Header from "./components/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import Dashboard from "./pages/Dashboard";
-import Calendar from "./pages/Calendar";
+import CalendarPage from "./pages/CalendarPage";
 import PR from "./pages/PR";
 import Weight from "./pages/Weight";
 import WorkoutRoutine from "./pages/WorkoutRoutine";
@@ -26,7 +26,7 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/prs" element={<PR />} />
           <Route path="/weight" element={<Weight />} />
           <Route path="/workoutroutine" element={<WorkoutRoutine />} />
