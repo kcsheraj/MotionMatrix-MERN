@@ -13,41 +13,51 @@ export default function Calendar() {
   }, [currentUser]);
 
   const fetchTodos = async () => {
-    const res = await fetch("/api/user/todo", {
-      headers: {
-        Authorization: `Bearer ${currentUser.token}`,
-      },
-    });
-    const data = await res.json();
-    setTodos(data);
+    try {
+      const res = await fetch("/api/todo", {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+      });
+      const data = await res.json();
+      setTodos(data);
+    } catch (error) {
+      console.error("Failed to fetch todos", error);
+    }
   };
 
   const handleAddTodo = async () => {
     if (!newTodo) return;
 
-    const res = await fetch("/api/user/todo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${currentUser.token}`,
-      },
-      body: JSON.stringify({ text: newTodo }),
-    });
-
-    const data = await res.json();
-    setTodos([...todos, data]);
-    setNewTodo("");
+    try {
+      const res = await fetch("/api/todo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+        body: JSON.stringify({ text: newTodo }),
+      });
+      const data = await res.json();
+      setTodos([...todos, data]);
+      setNewTodo("");
+    } catch (error) {
+      console.error("Failed to add todo", error);
+    }
   };
 
   const handleDeleteTodo = async (id) => {
-    await fetch(`/api/user/todo/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${currentUser.token}`,
-      },
-    });
-
-    setTodos(todos.filter((todo) => todo._id !== id));
+    try {
+      await fetch(`/api/todo/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+      });
+      setTodos(todos.filter((todo) => todo._id !== id));
+    } catch (error) {
+      console.error("Failed to delete todo", error);
+    }
   };
 
   return (
