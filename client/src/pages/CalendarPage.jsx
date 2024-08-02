@@ -156,13 +156,17 @@ export default function CalendarPage() {
         {currentUser ? `${currentUser.username}'s Calendar` : "Calendar"}
       </h1>
       <div className="flex justify-center">
-        <Calendar tileClassName={tileClassName} onClickDay={onClickDay} />
+        <Calendar
+          tileClassName={tileClassName}
+          onClickDay={onClickDay}
+          className="react-calendar rounded-xl border border-gray-600"
+        />
       </div>
       {selectedDate && (
         <div className="text-center mt-4">
           <button
             onClick={handleToggleDate}
-            className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+            className="bg-blue-600 text-white px-4 py-2 rounded mr-2"
           >
             Toggle Date
           </button>
@@ -175,7 +179,7 @@ export default function CalendarPage() {
               />
               <button
                 onClick={handleAddNote}
-                className={`bg-green-500 text-white px-4 py-2 rounded mt-2 ${
+                className={`bg-green-600 text-white px-4 py-2 rounded mt-2 ${
                   glow ? "glow" : ""
                 }`}
               >
@@ -183,7 +187,7 @@ export default function CalendarPage() {
               </button>
               <button
                 onClick={handleDeleteNote}
-                className="bg-red-500 text-white px-4 py-2 rounded mt-2"
+                className="bg-red-600 text-white px-4 py-2 rounded mt-2"
               >
                 Delete Note
               </button>
@@ -206,6 +210,16 @@ export default function CalendarPage() {
           100% {
             box-shadow: 0 0 5px #32cd32;
           }
+        }
+        .react-calendar__tile--active {
+          background-color: #4a4a4a; /* Darker background for active dates */
+          color: #ffffff; /* White text for active dates */
+        }
+        .react-calendar {
+          border-radius: 0.5rem; /* Rounded borders */
+        }
+        .react-calendar__month-view__weekdays {
+          color: #ffffff; /* White text for weekdays */
         }
       `}</style>
     </div>
