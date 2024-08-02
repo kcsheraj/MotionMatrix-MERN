@@ -11,6 +11,10 @@ const calendarDateSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    note: {
+      type: String,
+      default: "", // Add a note field
+    },
   },
   { timestamps: true }
 );

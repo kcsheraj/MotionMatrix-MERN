@@ -29,3 +29,31 @@ export const deleteDate = async (req, res, next) => {
     next(error);
   }
 };
+
+export const addNote = async (req, res, next) => {
+  try {
+    const { date, note } = req.body;
+    const updatedDate = await CalendarDate.findOneAndUpdate(
+      { date, userId: req.user.id },
+      { note },
+      { new: true }
+    );
+    res.status(200).json(updatedDate);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteNote = async (req, res, next) => {
+  try {
+    const { date } = req.params;
+    const updatedDate = await CalendarDate.findOneAndUpdate(
+      { date, userId: req.user.id },
+      { note: "" },
+      { new: true }
+    );
+    res.status(200).json(updatedDate);
+  } catch (error) {
+    next(error);
+  }
+};
