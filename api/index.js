@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRoutes from "./routes/user.route.js";
 import authRoutes from "./routes/auth.route.js";
-import todoRoutes from "./routes/todo.route.js"; // Import todo routes
+import routineRoutes from "./routes/routine.route.js"; // Import routine routes
 import cookieParser from "cookie-parser";
 import path from "path";
 
@@ -28,7 +28,7 @@ app.use(cookieParser());
 // Register the routes
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/todo", todoRoutes); // Use todo routes
+app.use("/api/routine", routineRoutes); // Use routine routes
 
 app.use(express.static(path.join(__dirname, "/client/dist")));
 

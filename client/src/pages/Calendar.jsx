@@ -3,60 +3,60 @@ import { useSelector } from "react-redux";
 
 export default function Calendar() {
   const { currentUser } = useSelector((state) => state.user);
-  const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState("");
+  const [routines, setRoutines] = useState([]);
+  const [newRoutine, setNewRoutine] = useState("");
 
   useEffect(() => {
     if (currentUser) {
-      fetchTodos();
+      fetchRoutines();
     }
   }, [currentUser]);
 
-  const fetchTodos = async () => {
+  const fetchRoutines = async () => {
     try {
-      const res = await fetch("/api/todo", {
+      const res = await fetch("/api/routine", {
         headers: {
           Authorization: `Bearer ${currentUser.token}`,
         },
       });
       const data = await res.json();
-      setTodos(data);
+      setRoutines(data);
     } catch (error) {
-      console.error("Failed to fetch todos", error);
+      console.error("Failed to fetch routines", error);
     }
   };
 
-  const handleAddTodo = async () => {
-    if (!newTodo) return;
+  const handleAddRoutine = async () => {
+    if (!newRoutine) return;
 
     try {
-      const res = await fetch("/api/todo", {
+      const res = await fetch("/api/routine", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${currentUser.token}`,
         },
-        body: JSON.stringify({ text: newTodo }),
+        body: JSON.stringify({ text: newRoutine }),
       });
       const data = await res.json();
-      setTodos([...todos, data]);
-      setNewTodo("");
+      setRoutines([...routines, data]);
+      setNewRoutine("");
     } catch (error) {
-      console.error("Failed to add todo", error);
+      console.error("Failed to add routine", error);
     }
   };
 
-  const handleDeleteTodo = async (id) => {
+  const handleDeleteRoutine = async (id) => {
     try {
-      await fetch(`/api/todo/${id}`, {
+      await fetch(`/api/routine/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${currentUser.token}`,
         },
       });
-      setTodos(todos.filter((todo) => todo._id !== id));
+      setRoutines(routines.filter((routine) => routine._id !== id));
     } catch (error) {
-      console.error("Failed to delete todo", error);
+      console.error("Failed to delete routine", error);
     }
   };
 
@@ -68,24 +68,24 @@ export default function Calendar() {
       <div className="mb-4">
         <input
           type="text"
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          placeholder="Add a new to-do"
+          value={newRoutine}
+          onChange={(e) => setNewRoutine(e.target.value)}
+          placeholder="Add a new routine"
           className="bg-slate-100 rounded-lg p-3 w-full"
         />
         <button
-          onClick={handleAddTodo}
+          onClick={handleAddRoutine}
           className="bg-slate-700 text-white p-3 rounded-lg mt-2 w-full"
         >
-          Add To-do
+          Add Routine
         </button>
       </div>
       <ul className="list-disc pl-5">
-        {todos.map((todo) => (
-          <li key={todo._id} className="mb-2">
-            {todo.text}
+        {routines.map((routine) => (
+          <li key={routine._id} className="mb-2">
+            {routine.text}
             <button
-              onClick={() => handleDeleteTodo(todo._id)}
+              onClick={() => handleDeleteRoutine(routine._id)}
               className="bg-red-500 text-white ml-4 p-1 rounded"
             >
               Delete

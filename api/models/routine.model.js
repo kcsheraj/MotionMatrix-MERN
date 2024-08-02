@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const todoSchema = new mongoose.Schema(
+const routineSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -15,6 +15,6 @@ const todoSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const ToDo = mongoose.model("ToDo", todoSchema);
+const Routine = mongoose.model("Routine", routineSchema);
 
-export default ToDo;
+export default Routine;
