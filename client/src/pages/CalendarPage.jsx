@@ -212,7 +212,7 @@ export default function CalendarPage() {
           }
         }
         .react-calendar__tile--active {
-          background-color: #4a4a4a; /* Darker background for active dates */
+          background-color: #4caf50; /* Green background for active dates */
           color: #ffffff; /* White text for active dates */
         }
         .react-calendar {
