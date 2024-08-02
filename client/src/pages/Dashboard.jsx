@@ -20,7 +20,7 @@ export default function Dashboard() {
           <Link
             key={card.id}
             to={card.path}
-            className="bg-white shadow-xl rounded-lg p-6 flex items-center justify-center text-slate-800 text-lg font-medium max-w-[200px] w-full lg:min-h-[500px] transition-transform transform hover:scale-105 hover:shadow-2xl"
+            className="bg-gray-400 shadow-xl rounded-lg p-6 flex items-center justify-center text-white text-lg font-medium max-w-[200px] w-full lg:min-h-[500px] transition-transform transform hover:scale-105 hover:shadow-2xl"
           >
             {card.title}
           </Link>
