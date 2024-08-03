@@ -1,3 +1,4 @@
+// models/routine.model.js
 import mongoose from "mongoose";
 
 const routineSchema = new mongoose.Schema(
@@ -6,6 +7,19 @@ const routineSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    dayOfWeek: {
+      type: String,
+      required: true,
+      enum: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ],
     },
     text: {
       type: String,

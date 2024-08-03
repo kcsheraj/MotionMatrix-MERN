@@ -5,6 +5,7 @@ export const addRoutine = async (req, res, next) => {
   try {
     const newRoutine = new Routine({
       userId: req.user.id,
+      dayOfWeek: req.body.dayOfWeek,
       text: req.body.text,
     });
     const savedRoutine = await newRoutine.save();
@@ -27,10 +28,10 @@ export const deleteRoutine = async (req, res, next) => {
   try {
     const routine = await Routine.findById(req.params.id);
     if (routine.userId.toString() !== req.user.id) {
-      return next(errorHandler(401, "You can delete only your own to-do!"));
+      return next(errorHandler(401, "You can delete only your own routine!"));
     }
     await routine.deleteOne();
-    res.status(200).json("To-do has been deleted...");
+    res.status(200).json("Routine has been deleted...");
   } catch (error) {
     next(error);
   }
