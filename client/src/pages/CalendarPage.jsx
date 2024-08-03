@@ -127,7 +127,7 @@ export default function CalendarPage() {
     if (persistedDates.some((d) => d.date === dateStr)) {
       return "react-calendar__tile--active";
     }
-    return null;
+    return "react-calendar__tile--default";
   };
 
   const onClickDay = (value) => {
@@ -159,14 +159,14 @@ export default function CalendarPage() {
         <Calendar
           tileClassName={tileClassName}
           onClickDay={onClickDay}
-          className="react-calendar rounded-xl border border-gray-600"
+          className="react-calendar modern-calendar"
         />
       </div>
       {selectedDate && (
         <div className="text-center mt-4">
           <button
             onClick={handleToggleDate}
-            className="bg-blue-600 text-white px-4 py-2 rounded mr-2"
+            className="bg-slate-700 text-white px-4 py-2 rounded-lg mr-2"
           >
             Toggle Date
           </button>
@@ -175,11 +175,12 @@ export default function CalendarPage() {
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                className="border rounded p-2 w-full mt-2"
+                className="border rounded-lg p-4 w-full mt-2 bg-slate-100 text-lg"
+                placeholder="Add a note..."
               />
               <button
                 onClick={handleAddNote}
-                className={`bg-green-600 text-white px-4 py-2 rounded mt-2 ${
+                className={`bg-slate-700 text-white px-4 py-2 rounded-lg mt-2 ${
                   glow ? "glow" : ""
                 }`}
               >
@@ -187,7 +188,7 @@ export default function CalendarPage() {
               </button>
               <button
                 onClick={handleDeleteNote}
-                className="bg-red-600 text-white px-4 py-2 rounded mt-2"
+                className="bg-red-600 text-white px-4 py-2 rounded-lg mt-2"
               >
                 Delete Note
               </button>
@@ -196,6 +197,40 @@ export default function CalendarPage() {
         </div>
       )}
       <style>{`
+        .modern-calendar {
+          border-radius: 1rem; /* Increased border-radius for a modern look */
+          border: 1px solid #4f5b62; /* Gray border for the calendar */
+          font-family: 'Helvetica Neue', sans-serif; /* Modern font */
+          font-size: 1.25rem; /* Larger font size */
+          width: 100%; /* Full width */
+          max-width: 800px; /* Max width for the calendar */
+        }
+        .react-calendar__tile--active {
+          background-color: #4f5b62; /* Gray background for active dates */
+          color: #ffffff; /* White text for active dates */
+          border-radius: 0.5rem; /* Keep rounded corners */
+        }
+        .react-calendar__tile--default {
+          border-radius: 0.5rem; /* Keep rounded corners */
+        }
+        .react-calendar__month-view__days {
+          font-size: 1.25rem; /* Larger font size for day names */
+        }
+        .react-calendar__month-view__days__day {
+          height: 3rem; /* Larger day tile height */
+          width: 3rem; /* Larger day tile width */
+          margin: 0.25rem; /* Padding between day tiles */
+        }
+        .react-calendar__month-view__weekdays {
+          font-size: 1.125rem; /* Adjusted font size for weekdays */
+        }
+        .react-calendar__month-view__weekdays__weekday {
+          height: 3rem; /* Larger weekday tile height */
+          width: 3rem; /* Larger weekday tile width */
+        }
+        .react-calendar {
+          border-radius: 1rem; /* Ensure rounded corners */
+        }
         .glow {
           animation: glow 1s ease-in-out;
         }
@@ -207,19 +242,9 @@ export default function CalendarPage() {
           50% {
             box-shadow: 0 0 20px #32cd32;
           }
-          100% {
+           100% {
             box-shadow: 0 0 5px #32cd32;
           }
-        }
-        .react-calendar__tile--active {
-          background-color: #4caf50; /* Green background for active dates */
-          color: #ffffff; /* White text for active dates */
-        }
-        .react-calendar {
-          border-radius: 0.5rem; /* Rounded borders */
-        }
-        .react-calendar__month-view__weekdays {
-          color: #ffffff; /* White text for weekdays */
         }
       `}</style>
     </div>
