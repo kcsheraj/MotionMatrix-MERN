@@ -56,13 +56,21 @@ export default function PR() {
     if (!newRecord.weight || !newRecord.date) return;
 
     try {
+      const adjustedDate = new Date(newRecord.date);
+      adjustedDate.setMinutes(
+        adjustedDate.getMinutes() + adjustedDate.getTimezoneOffset()
+      ); // Adjust for timezone
+
       const res = await fetch(`/api/pr/${exerciseId}/record`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${currentUser.token}`,
         },
-        body: JSON.stringify(newRecord),
+        body: JSON.stringify({
+          weight: newRecord.weight,
+          date: adjustedDate.toISOString(),
+        }),
       });
       const data = await res.json();
       setPRs(prs.map((pr) => (pr._id === exerciseId ? data : pr)));
@@ -130,6 +138,22 @@ export default function PR() {
     setSelectedExercise(null);
   };
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const getCurrentPR = (records) => {
+    if (records.length === 0) return "No PR yet";
+    const maxRecord = records.reduce((max, record) =>
+      record.weight > max.weight ? record : max
+    );
+    return `${maxRecord.weight} lbs on ${formatDate(maxRecord.date)}`;
+  };
+
   return (
     <div
       className="flex flex-col items-center h-screen bg-gray-100"
@@ -182,29 +206,34 @@ export default function PR() {
               >
                 {pr.exercise}
               </h2>
+              <p className="text-blue-600 text-center mb-2">
+                Current PR: {getCurrentPR(pr.records)}
+              </p>
               <ul className="list-disc pl-5 mt-2">
-                {pr.records.map((record) => (
-                  <li
-                    key={record._id}
-                    className="mb-2 flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-md"
-                  >
-                    <span className="flex-1 break-words text-gray-800">
-                      {record.weight} lbs -{" "}
-                      {new Date(record.date).toLocaleDateString()}
-                    </span>
-                    {selectedExercise === pr._id && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent the click event from affecting the parent div
-                          handleDeleteRecord(pr._id, record._id);
-                        }}
-                        className="bg-red-500 text-white p-2 rounded-lg"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </li>
-                ))}
+                {pr.records
+                  .sort((a, b) => new Date(a.date) - new Date(b.date))
+                  .map((record) => (
+                    <li
+                      key={record._id}
+                      className="mb-2 flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-md"
+                    >
+                      <span className="flex-1 break-words text-gray-800">
+                        {record.weight} lbs -{" "}
+                        {new Date(record.date).toLocaleDateString()}
+                      </span>
+                      {selectedExercise === pr._id && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent the click event from affecting the parent div
+                            handleDeleteRecord(pr._id, record._id);
+                          }}
+                          className="bg-red-500 text-white p-2 rounded-lg"
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </li>
+                  ))}
               </ul>
               {selectedExercise === pr._id && (
                 <div className="mt-4">

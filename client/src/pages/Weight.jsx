@@ -53,13 +53,21 @@ export default function Weight() {
     if (!newWeight || !date) return;
 
     try {
+      const adjustedDate = new Date(date);
+      adjustedDate.setMinutes(
+        adjustedDate.getMinutes() + adjustedDate.getTimezoneOffset()
+      ); // Adjust for timezone
+
       const res = await fetch("/api/weight", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${currentUser.token}`,
         },
-        body: JSON.stringify({ weight: newWeight, date }),
+        body: JSON.stringify({
+          weight: newWeight,
+          date: adjustedDate.toISOString(),
+        }),
       });
       const data = await res.json();
       setWeights(sortByDateAscending([...weights, data]));
