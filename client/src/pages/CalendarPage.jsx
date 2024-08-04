@@ -25,20 +25,20 @@ export default function CalendarPage() {
         },
       });
       const data = await res.json();
-      setPersistedDates(data); // Store the full date objects including notes
+      setPersistedDates(data);
     } catch (error) {
       console.error("Failed to fetch persisted dates", error);
     }
   };
 
   const handleToggleDate = async () => {
-    const dateStr = selectedDate.toISOString().split("T")[0]; // Format date to YYYY-MM-DD
+    const dateStr = selectedDate.toISOString().split("T")[0];
     if (persistedDates.some((d) => d.date === dateStr)) {
       await handleDeleteDate(dateStr);
     } else {
       await handleAddDate(dateStr);
     }
-    setSelectedDate(selectedDate); // Ensure the selected date remains the same after toggling
+    setSelectedDate(selectedDate);
   };
 
   const handleAddDate = async (dateStr) => {
@@ -53,8 +53,8 @@ export default function CalendarPage() {
       });
       const data = await res.json();
       setPersistedDates((prevDates) => [...prevDates, data]);
-      setNoteExists(true); // Assume adding a note immediately after toggling
-      setNote(""); // Clear the note field
+      setNoteExists(true);
+      setNote("");
     } catch (error) {
       console.error("Failed to add date", error);
     }
@@ -71,15 +71,15 @@ export default function CalendarPage() {
       setPersistedDates((prevDates) =>
         prevDates.filter((d) => d.date !== dateStr)
       );
-      setSelectedDate(null); // Clear the selected date
-      window.location.reload(); // Refresh the page
+      setSelectedDate(null);
+      window.location.reload();
     } catch (error) {
       console.error("Failed to delete date", error);
     }
   };
 
   const handleAddNote = async () => {
-    const dateStr = selectedDate.toISOString().split("T")[0]; // Format date to YYYY-MM-DD
+    const dateStr = selectedDate.toISOString().split("T")[0];
     try {
       const res = await fetch("/api/calendar/note", {
         method: "POST",
@@ -97,14 +97,14 @@ export default function CalendarPage() {
       );
       setNoteExists(true);
       setGlow(true);
-      setTimeout(() => setGlow(false), 1000); // Remove the glow after 1 second
+      setTimeout(() => setGlow(false), 1000);
     } catch (error) {
       console.error("Failed to add note", error);
     }
   };
 
   const handleDeleteNote = async () => {
-    const dateStr = selectedDate.toISOString().split("T")[0]; // Format date to YYYY-MM-DD
+    const dateStr = selectedDate.toISOString().split("T")[0];
     try {
       await fetch(`/api/calendar/note/${dateStr}`, {
         method: "DELETE",
@@ -123,16 +123,15 @@ export default function CalendarPage() {
   };
 
   const tileClassName = ({ date }) => {
-    const dateStr = date.toISOString().split("T")[0]; // Format date to YYYY-MM-DD
-    if (persistedDates.some((d) => d.date === dateStr)) {
-      return "react-calendar__tile--active";
-    }
-    return "react-calendar__tile--default";
+    const dateStr = date.toISOString().split("T")[0];
+    return persistedDates.some((d) => d.date === dateStr)
+      ? "react-calendar__tile--active"
+      : "react-calendar__tile--default";
   };
 
   const onClickDay = (value) => {
     setSelectedDate(value);
-    const dateStr = value.toISOString().split("T")[0]; // Format date to YYYY-MM-DD
+    const dateStr = value.toISOString().split("T")[0];
     const dateObj = persistedDates.find((d) => d.date === dateStr);
     if (dateObj) {
       setNoteExists(true);
@@ -151,55 +150,59 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="px-4 py-12 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-10 text-slate-800 text-center">
-        {currentUser ? `${currentUser.username}'s Calendar` : "Calendar"}
-      </h1>
-      <div className="flex justify-center">
-        <Calendar
-          tileClassName={tileClassName}
-          onClickDay={onClickDay}
-          className="react-calendar modern-calendar"
-        />
-      </div>
-      {selectedDate && (
-        <div className="text-center mt-4">
-          <button
-            onClick={handleToggleDate}
-            className="bg-slate-700 text-white px-4 py-2 rounded-lg mr-2"
-          >
-            Toggle Date
-          </button>
-          {isDatePersisted() && (
-            <div>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                className="border rounded-lg p-4 w-full mt-2 bg-slate-100 text-lg"
-                placeholder="Add a note..."
-              />
-              <button
-                onClick={handleAddNote}
-                className={`bg-slate-700 text-white px-4 py-2 rounded-lg mt-2 ${
-                  glow ? "glow" : ""
-                }`}
-              >
-                Save Note
-              </button>
-              <button
-                onClick={handleDeleteNote}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg mt-2"
-              >
-                Delete Note
-              </button>
-            </div>
-          )}
+    <div className="flex flex-col items-center min-h-screen bg-gradient-to-r from-gray-100 to-gray-200">
+      <div className="px-4 py-12 max-w-7xl w-full bg-white/60 backdrop-blur-md rounded-lg shadow-lg border border-white/30">
+        <h1 className="text-4xl font-extrabold mb-10 text-slate-800 text-center">
+          Calendar
+        </h1>
+        <div className="flex justify-center mb-6">
+          <Calendar
+            tileClassName={tileClassName}
+            onClickDay={onClickDay}
+            className="react-calendar modern-calendar"
+          />
         </div>
-      )}
+        {selectedDate && (
+          <div className="text-center">
+            <button
+              onClick={handleToggleDate}
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg"
+            >
+              Toggle Date
+            </button>
+            {isDatePersisted() && (
+              <div className="mt-4">
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  className="border rounded-lg p-4 w-full mt-2 bg-white/80 text-lg shadow-md resize-none"
+                  placeholder="Add a note..."
+                />
+                <div className="mt-2 flex justify-center gap-2">
+                  <button
+                    onClick={handleAddNote}
+                    className={`bg-gray-800 text-white px-4 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg ${
+                      glow ? "glow" : ""
+                    }`}
+                  >
+                    Save Note
+                  </button>
+                  <button
+                    onClick={handleDeleteNote}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg shadow-md transition-transform transform hover:scale-105 hover:shadow-lg"
+                  >
+                    Delete Note
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       <style>{`
         .modern-calendar {
           border-radius: 1rem; /* Increased border-radius for a modern look */
-          border: 1px solid #4f5b62; /* Gray border for the calendar */
+          border: 1px solid #e5e7eb; /* Light gray border for the calendar */
           font-family: 'Helvetica Neue', sans-serif; /* Modern font */
           font-size: 1.25rem; /* Larger font size */
           width: 100%; /* Full width */
@@ -234,16 +237,15 @@ export default function CalendarPage() {
         .glow {
           animation: glow 1s ease-in-out;
         }
-
         @keyframes glow {
           0% {
-            box-shadow: 0 0 5px #32cd32;
+            box-shadow: 0 0 8px rgba(50, 205, 50, 0.6);
           }
           50% {
-            box-shadow: 0 0 20px #32cd32;
+            box-shadow: 0 0 20px rgba(50, 205, 50, 0.8);
           }
-           100% {
-            box-shadow: 0 0 5px #32cd32;
+          100% {
+            box-shadow: 0 0 8px rgba(50, 205, 50, 0.6);
           }
         }
       `}</style>

@@ -94,68 +94,74 @@ export default function WorkoutRoutine() {
   }, {});
 
   return (
-    <div className="px-4 py-12 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-10 text-slate-800 text-center">
-        {currentUser
-          ? `${currentUser.username}'s Workout Routine`
-          : "Workout Routine"}
-      </h1>
-      <div className="mb-4 flex flex-col gap-4">
-        <select
-          name="dayOfWeek"
-          value={newRoutine.dayOfWeek}
-          onChange={handleInputChange}
-          className="bg-slate-100 rounded-lg p-3 w-full"
-        >
-          <option value="">Select Day</option>
-          {daysOfWeek.map((day) => (
-            <option key={day} value={day}>
-              {day}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          name="text"
-          value={newRoutine.text}
-          onChange={handleInputChange}
-          placeholder="Add a new workout"
-          className="bg-slate-100 rounded-lg p-3 w-full"
-        />
-        <button
-          onClick={handleAddRoutine}
-          className="bg-slate-700 text-white p-3 rounded-lg mt-2 w-full"
-        >
-          Add Workout
-        </button>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
-        {daysOfWeek.map((day) => (
-          <div
-            key={day}
-            className={`bg-gray-200 p-4 rounded-lg cursor-pointer break-words ${
-              selectedDay === day ? "bg-gray-300" : ""
-            }`}
-            onClick={() => handleDayClick(day)}
-          >
-            <h2 className="text-lg font-bold text-center">{day}</h2>
-            <ul className="list-disc pl-5">
-              {(groupedRoutines[day] || []).map((routine) => (
-                <li
-                  key={routine._id}
-                  className={`mb-2 flex justify-between items-start bg-white p-2 rounded-lg ${
-                    selectedDay === day ? "border-2 border-red-500" : ""
-                  }`}
-                  onClick={() =>
-                    selectedDay === day && handleBulletClick(routine)
-                  }
-                >
-                  <span className="flex-1 break-words">{routine.text}</span>
-                </li>
+    <div className="flex flex-col items-center h-screen bg-gray-100">
+      <div className="px-4 py-12 max-w-7xl w-full">
+        <h1 className="text-4xl font-extrabold mb-10 text-gray-900 text-center">
+          Workout Routine
+        </h1>
+        <div className="mb-4 flex flex-col gap-4 items-center">
+          <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+            <select
+              name="dayOfWeek"
+              value={newRoutine.dayOfWeek}
+              onChange={handleInputChange}
+              className="bg-white rounded-lg p-3 w-full border border-gray-300 mb-2"
+            >
+              <option value="">Select Day</option>
+              {daysOfWeek.map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
               ))}
-            </ul>
+            </select>
+            <input
+              type="text"
+              name="text"
+              value={newRoutine.text}
+              onChange={handleInputChange}
+              placeholder="Add a new workout"
+              className="bg-white rounded-lg p-3 w-full border border-gray-300 mb-2"
+            />
+            <button
+              onClick={handleAddRoutine}
+              className="bg-gray-800 text-white p-3 rounded-lg w-full transition-transform transform hover:scale-105"
+            >
+              Add Workout
+            </button>
           </div>
-        ))}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
+          {daysOfWeek.map((day) => (
+            <div
+              key={day}
+              className={`bg-white p-4 rounded-lg border border-gray-300 ${
+                selectedDay === day ? "border-4 border-gray-800" : ""
+              } shadow-lg transition-transform transform hover:scale-105`}
+              onClick={() => handleDayClick(day)}
+            >
+              <h2 className="text-lg text-gray-800 text-center">{day}</h2>
+              <ul className="list-disc pl-5 mt-2">
+                {(groupedRoutines[day] || []).map((routine) => (
+                  <li
+                    key={routine._id}
+                    className={`mb-2 flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-md ${
+                      selectedDay === day
+                        ? "bg-gray-100 border-2 border-red-500"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      selectedDay === day && handleBulletClick(routine)
+                    }
+                  >
+                    <span className="flex-1 break-words text-gray-800">
+                      {routine.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

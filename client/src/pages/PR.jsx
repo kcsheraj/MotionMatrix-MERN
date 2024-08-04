@@ -131,112 +131,117 @@ export default function PR() {
   };
 
   return (
-    <div className="px-4 py-12 max-w-7xl mx-auto" ref={containerRef}>
-      <h1
-        className="text-3xl font-bold mb-10 text-slate-800 text-center cursor-pointer"
-        onClick={handleTitleClick}
-      >
-        {currentUser ? `${currentUser.username}'s PRs` : "PR's"}
-      </h1>
-      <div className="mb-4 flex flex-col gap-4">
-        {showAddExercise ? (
-          <>
-            <input
-              type="text"
-              value={newExercise}
-              onChange={(e) => setNewExercise(e.target.value)}
-              placeholder="Add a new exercise"
-              className="bg-slate-100 rounded-lg p-3 w-full"
-            />
+    <div
+      className="flex flex-col items-center h-screen bg-gray-100"
+      ref={containerRef}
+    >
+      <div className="px-4 py-12 max-w-7xl w-full">
+        <h1
+          className="text-4xl font-extrabold mb-10 text-gray-900 text-center cursor-pointer"
+          onClick={handleTitleClick}
+        >
+          PR's
+        </h1>
+        <div className="mb-4 flex flex-col gap-4 items-center">
+          {showAddExercise ? (
+            <>
+              <input
+                type="text"
+                value={newExercise}
+                onChange={(e) => setNewExercise(e.target.value)}
+                placeholder="Add a new exercise"
+                className="bg-white rounded-lg p-3 w-full max-w-md border border-gray-300 shadow-md"
+              />
+              <button
+                onClick={handleAddExercise}
+                className="bg-gray-800 text-white p-3 rounded-lg mt-2 w-full max-w-md transition-transform transform hover:scale-105"
+              >
+                Add Exercise
+              </button>
+            </>
+          ) : (
             <button
-              onClick={handleAddExercise}
-              className="bg-slate-700 text-white p-3 rounded-lg mt-2 w-full"
+              onClick={handleAddExerciseClick}
+              className="bg-gray-800 text-white p-3 rounded-lg mt-2 w-full max-w-md transition-transform transform hover:scale-105"
             >
-              Add Exercise
+              Add New Exercise
             </button>
-          </>
-        ) : (
-          <button
-            onClick={handleAddExerciseClick}
-            className="bg-slate-700 text-white p-3 rounded-lg mt-2 w-full"
-          >
-            Add New Exercise
-          </button>
-        )}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {prs.map((pr) => (
-          <div
-            key={pr._id}
-            className={`bg-gray-200 p-4 rounded-lg ${
-              selectedExercise === pr._id ? "border-4 border-slate-700" : ""
-            }`}
-          >
-            <h2
-              className="text-lg font-bold text-center cursor-pointer"
-              onClick={() => handleExerciseTitleClick(pr._id)}
+          )}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {prs.map((pr) => (
+            <div
+              key={pr._id}
+              className={`bg-white p-4 rounded-lg border border-gray-300 ${
+                selectedExercise === pr._id ? "border-4 border-gray-800" : ""
+              } shadow-lg transition-transform transform hover:scale-105`}
             >
-              {pr.exercise}
-            </h2>
-            <ul className="list-disc pl-5">
-              {pr.records.map((record) => (
-                <li
-                  key={record._id}
-                  className="mb-2 flex justify-between items-start bg-white p-2 rounded-lg"
-                >
-                  <span className="flex-1 break-words">
-                    {record.weight} lbs -{" "}
-                    {new Date(record.date).toLocaleDateString()}
-                  </span>
-                  {selectedExercise === pr._id && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent the click event from affecting the parent div
-                        handleDeleteRecord(pr._id, record._id);
-                      }}
-                      className="bg-red-500 text-white p-2 rounded-lg ml-2"
-                    >
-                      Delete
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-            {selectedExercise === pr._id && (
-              <div className="mt-4">
-                <input
-                  type="number"
-                  value={newRecord.weight}
-                  onChange={(e) =>
-                    setNewRecord({ ...newRecord, weight: e.target.value })
-                  }
-                  placeholder="Weight (lbs)"
-                  className="bg-slate-100 rounded-lg p-3 w-full mb-2"
-                />
-                <input
-                  type="date"
-                  value={newRecord.date}
-                  onChange={(e) =>
-                    setNewRecord({ ...newRecord, date: e.target.value })
-                  }
-                  className="bg-slate-100 rounded-lg p-3 w-full mb-2"
-                />
-                <button
-                  onClick={() => handleAddRecord(pr._id)}
-                  className="bg-slate-700 text-white p-3 rounded-lg w-full"
-                >
-                  Add PR
-                </button>
-                <button
-                  onClick={() => handleDeleteExercise(pr._id)}
-                  className="bg-red-500 text-white p-3 rounded-lg w-full mt-2"
-                >
-                  Delete Exercise
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+              <h2
+                className="text-lg text-gray-800 text-center cursor-pointer"
+                onClick={() => handleExerciseTitleClick(pr._id)}
+              >
+                {pr.exercise}
+              </h2>
+              <ul className="list-disc pl-5 mt-2">
+                {pr.records.map((record) => (
+                  <li
+                    key={record._id}
+                    className="mb-2 flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-md"
+                  >
+                    <span className="flex-1 break-words text-gray-800">
+                      {record.weight} lbs -{" "}
+                      {new Date(record.date).toLocaleDateString()}
+                    </span>
+                    {selectedExercise === pr._id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent the click event from affecting the parent div
+                          handleDeleteRecord(pr._id, record._id);
+                        }}
+                        className="bg-red-500 text-white p-2 rounded-lg"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {selectedExercise === pr._id && (
+                <div className="mt-4">
+                  <input
+                    type="number"
+                    value={newRecord.weight}
+                    onChange={(e) =>
+                      setNewRecord({ ...newRecord, weight: e.target.value })
+                    }
+                    placeholder="Weight (lbs)"
+                    className="bg-white rounded-lg p-3 w-full mb-2 border border-gray-300"
+                  />
+                  <input
+                    type="date"
+                    value={newRecord.date}
+                    onChange={(e) =>
+                      setNewRecord({ ...newRecord, date: e.target.value })
+                    }
+                    className="bg-white rounded-lg p-3 w-full mb-2 border border-gray-300"
+                  />
+                  <button
+                    onClick={() => handleAddRecord(pr._id)}
+                    className="bg-gray-800 text-white p-3 rounded-lg w-full mb-2 transition-transform transform hover:scale-105"
+                  >
+                    Add PR
+                  </button>
+                  <button
+                    onClick={() => handleDeleteExercise(pr._id)}
+                    className="bg-red-500 text-white p-3 rounded-lg w-full transition-transform transform hover:scale-105"
+                  >
+                    Delete Exercise
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

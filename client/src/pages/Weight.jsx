@@ -173,93 +173,95 @@ export default function Weight() {
     weightChange >= 0 ? "text-green-600" : "text-red-600";
 
   return (
-    <div className="px-4 py-12 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold mb-10 text-slate-800 text-center">
-        Weight
-      </h1>
-      <div className="mb-4 flex flex-col gap-4">
-        <input
-          type="number"
-          value={newWeight}
-          onChange={(e) => setNewWeight(e.target.value)}
-          placeholder="Enter weight in lbs"
-          className="bg-slate-100 rounded-lg p-3 w-full"
-        />
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="bg-slate-100 rounded-lg p-3 w-full"
-        />
-        <button
-          onClick={handleAddWeight}
-          className="bg-slate-700 text-white p-3 rounded-lg mt-2 w-full"
-        >
-          Add Weight
-        </button>
-      </div>
-      <div className="mb-8">
-        <Line
-          data={data}
-          options={{ responsive: true, maintainAspectRatio: false }}
-        />
-      </div>
-      <div className="mb-4 flex flex-col md:flex-row gap-4">
-        <select
-          value={filterMonth}
-          onChange={(e) => handleFilterChange(setFilterMonth, e.target.value)}
-          className="bg-slate-100 rounded-lg p-3 w-full md:w-1/2"
-        >
-          {months.map((month) => (
-            <option key={month.value} value={month.value}>
-              {month.label}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filterYear}
-          onChange={(e) => handleFilterChange(setFilterYear, e.target.value)}
-          className="bg-slate-100 rounded-lg p-3 w-full md:w-1/2"
-        >
-          <option value="">All Years</option>
-          {years.map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={handleClearFilters}
-          className="bg-slate-700 text-white p-3 rounded-lg mt-2 w-full md:w-auto"
-        >
-          Clear Filters
-        </button>
-      </div>
-      {weightChange !== null && (
-        <div className="mb-4 text-center">
-          <p className={`text-lg font-semibold ${weightChangeTextColor}`}>
-            Total Weight {weightChange >= 0 ? "Gained" : "Lost"}:{" "}
-            {Math.abs(weightChange)} lbs
-          </p>
-        </div>
-      )}
-      <div className="grid grid-cols-1 gap-4">
-        {weightsAscForList.map((weight) => (
-          <div
-            key={weight._id}
-            className="flex justify-between items-center bg-gray-200 p-4 rounded-lg"
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 px-4 py-12">
+      <div className="max-w-7xl w-full">
+        <h1 className="text-4xl font-extrabold mb-10 text-gray-900 text-center">
+          Weight Tracker
+        </h1>
+        <div className="mb-4 flex flex-col gap-4 items-center">
+          <input
+            type="number"
+            value={newWeight}
+            onChange={(e) => setNewWeight(e.target.value)}
+            placeholder="Enter weight in lbs"
+            className="bg-white rounded-lg p-3 w-full max-w-md border border-gray-300 shadow-md"
+          />
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="bg-white rounded-lg p-3 w-full max-w-md border border-gray-300 shadow-md"
+          />
+          <button
+            onClick={handleAddWeight}
+            className="bg-gray-800 text-white p-3 rounded-lg w-full max-w-md mt-2 transition-transform transform hover:scale-105"
           >
-            <span>
-              {formatDate(weight.date)}: {weight.weight} lbs
-            </span>
-            <button
-              onClick={() => handleDeleteWeight(weight._id)}
-              className="bg-red-500 text-white p-2 rounded-lg"
-            >
-              Delete
-            </button>
+            Add Weight
+          </button>
+        </div>
+        <div className="mb-8">
+          <Line
+            data={data}
+            options={{ responsive: true, maintainAspectRatio: false }}
+          />
+        </div>
+        <div className="mb-4 flex flex-col md:flex-row gap-4 items-center">
+          <select
+            value={filterMonth}
+            onChange={(e) => handleFilterChange(setFilterMonth, e.target.value)}
+            className="bg-white rounded-lg p-3 w-full md:w-1/2 border border-gray-300 shadow-md"
+          >
+            {months.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterYear}
+            onChange={(e) => handleFilterChange(setFilterYear, e.target.value)}
+            className="bg-white rounded-lg p-3 w-full md:w-1/2 border border-gray-300 shadow-md"
+          >
+            <option value="">All Years</option>
+            {years.map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleClearFilters}
+            className="bg-gray-800 text-white p-3 rounded-lg mt-2 w-full md:w-auto transition-transform transform hover:scale-105"
+          >
+            Clear Filters
+          </button>
+        </div>
+        {weightChange !== null && (
+          <div className="mb-4 text-center">
+            <p className={`text-lg font-semibold ${weightChangeTextColor}`}>
+              Total Weight {weightChange >= 0 ? "Gained" : "Lost"}:{" "}
+              {Math.abs(weightChange)} lbs
+            </p>
           </div>
-        ))}
+        )}
+        <div className="grid grid-cols-1 gap-4">
+          {weightsAscForList.map((weight) => (
+            <div
+              key={weight._id}
+              className="flex justify-between items-center bg-white p-4 rounded-lg border border-gray-300 shadow-md"
+            >
+              <span>
+                {formatDate(weight.date)}: {weight.weight} lbs
+              </span>
+              <button
+                onClick={() => handleDeleteWeight(weight._id)}
+                className="bg-red-500 text-white p-2 rounded-lg transition-transform transform hover:scale-105"
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
