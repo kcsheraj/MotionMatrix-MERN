@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 export default function PR() {
@@ -8,8 +8,6 @@ export default function PR() {
   const [newRecord, setNewRecord] = useState({ weight: "", date: "" });
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [showAddExercise, setShowAddExercise] = useState(false);
-
-  const containerRef = useRef(null);
 
   useEffect(() => {
     if (currentUser) {
@@ -155,10 +153,7 @@ export default function PR() {
   };
 
   return (
-    <div
-      className="flex flex-col items-center h-screen bg-gray-100"
-      ref={containerRef}
-    >
+    <div className="flex flex-col items-center min-h-screen bg-gray-100">
       <div className="px-4 py-12 max-w-7xl w-full">
         <h1
           className="text-4xl font-extrabold mb-10 text-gray-900 text-center cursor-pointer"
@@ -207,19 +202,22 @@ export default function PR() {
                 {pr.exercise}
               </h2>
               <p className="text-blue-600 text-center mb-2">
-                Current PR: {getCurrentPR(pr.records)}
+                {getCurrentPR(pr.records)}
               </p>
-              <ul className="list-disc pl-5 mt-2">
+              <ul
+                className={`list-disc pl-5 mt-2 ${
+                  pr.records.length > 5 ? "max-h-64 overflow-y-auto" : ""
+                }`}
+              >
                 {pr.records
-                  .sort((a, b) => new Date(a.date) - new Date(b.date))
+                  .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort records by date in descending order
                   .map((record) => (
                     <li
                       key={record._id}
                       className="mb-2 flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-md"
                     >
                       <span className="flex-1 break-words text-gray-800">
-                        {record.weight} lbs -{" "}
-                        {new Date(record.date).toLocaleDateString()}
+                        {record.weight} lbs - {formatDate(record.date)}
                       </span>
                       {selectedExercise === pr._id && (
                         <button
