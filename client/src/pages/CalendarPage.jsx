@@ -208,6 +208,17 @@ export default function CalendarPage() {
           width: 100%; /* Full width */
           max-width: 800px; /* Max width for the calendar */
         }
+
+        .react-calendar__navigation__arrow {
+          font-size: 4.5rem; /* Larger arrow size */
+          color: #e5e7eb; /* Gray color for the arrows */
+        }
+
+        .react-calendar__navigation__arrow--prev,
+        .react-calendar__navigation__arrow--next {
+          display: none; /* Hide navigation arrows */
+        }
+
         .react-calendar__tile--active {
           background-color: #4f5b62; /* Gray background for active dates */
           color: #ffffff; /* White text for active dates */
@@ -230,6 +241,11 @@ export default function CalendarPage() {
         .react-calendar__month-view__weekdays__weekday {
           height: 3rem; /* Larger weekday tile height */
           width: 3rem; /* Larger weekday tile width */
+        }
+
+        .react-calendar__month-view__weekdays {
+          font-size: 1.125rem; /* Adjusted font size for weekdays */
+          color: #888888; /* Light gray color for weekday names */
         }
         .react-calendar {
           border-radius: 1rem; /* Ensure rounded corners */
