@@ -27,6 +27,8 @@ export default function Profile() {
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showReenterPassword, setShowReenterPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   const { currentUser, loading, error } = useSelector((state) => state.user);
 
@@ -61,10 +63,25 @@ export default function Profile() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
+    if (e.target.id === "password") {
+      setShowReenterPassword(true);
+    }
+    if (
+      e.target.id === "reenterPassword" &&
+      formData.password !== e.target.value
+    ) {
+      setPasswordError("Passwords do not match.");
+    } else {
+      setPasswordError("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password && formData.password !== formData.reenterPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
     try {
       dispatch(updateUserStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
@@ -114,7 +131,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300">
       <div className="p-8 max-w-md w-full bg-white/20 backdrop-blur-md rounded-2xl shadow-xl border border-white/50">
         <h1 className="text-4xl font-extrabold text-center mb-6 text-gray-900">
           Profile
@@ -148,6 +165,9 @@ export default function Profile() {
               ""
             )}
           </p>
+          <label htmlFor="username" className="text-gray-700">
+            Username:
+          </label>
           <input
             defaultValue={currentUser.username}
             type="text"
@@ -156,6 +176,9 @@ export default function Profile() {
             className="bg-slate-100 rounded-lg p-3"
             onChange={handleChange}
           />
+          <label htmlFor="email" className="text-gray-700">
+            Email:
+          </label>
           <input
             defaultValue={currentUser.email}
             type="email"
@@ -164,6 +187,9 @@ export default function Profile() {
             className="bg-slate-100 rounded-lg p-3"
             onChange={handleChange}
           />
+          <label htmlFor="password" className="text-gray-700">
+            Password:
+          </label>
           <input
             type="password"
             id="password"
@@ -171,6 +197,21 @@ export default function Profile() {
             className="bg-slate-100 rounded-lg p-3"
             onChange={handleChange}
           />
+          {showReenterPassword && (
+            <>
+              <label htmlFor="reenterPassword" className="text-gray-700">
+                Re-enter Password:
+              </label>
+              <input
+                type="password"
+                id="reenterPassword"
+                placeholder="Re-enter Password"
+                className="bg-slate-100 rounded-lg p-3"
+                onChange={handleChange}
+              />
+              {passwordError && <p className="text-red-700">{passwordError}</p>}
+            </>
+          )}
           <button
             className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
             disabled={loading}
@@ -196,7 +237,7 @@ export default function Profile() {
       </div>
 
       {showDeleteModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 pt-20">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
             <p className="mb-4">
