@@ -26,6 +26,7 @@ export default function Profile() {
   const [imageError, setImageError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { currentUser, loading, error } = useSelector((state) => state.user);
 
@@ -100,6 +101,7 @@ export default function Profile() {
     } catch (error) {
       dispatch(deleteUserFailure(error));
     }
+    setShowDeleteModal(false);
   };
 
   const handleSignOut = async () => {
@@ -178,7 +180,7 @@ export default function Profile() {
         </form>
         <div className="flex justify-between mt-5">
           <span
-            onClick={handleDeleteAccount}
+            onClick={() => setShowDeleteModal(true)}
             className="text-red-700 cursor-pointer"
           >
             Delete Account
@@ -192,6 +194,31 @@ export default function Profile() {
           {updateSuccess && "User is updated successfully!"}
         </p>
       </div>
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+            <p className="mb-4">
+              Are you sure you want to delete your account?
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="bg-gray-200 text-gray-800 px-4 py-2 rounded mr-2"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className="bg-red-600 text-white px-4 py-2 rounded"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
