@@ -28,6 +28,7 @@ export default function Weight() {
   const [filterMonth, setFilterMonth] = useState("");
   const [filterYear, setFilterYear] = useState("");
   const [weightChange, setWeightChange] = useState(null);
+  const [currentWeight, setCurrentWeight] = useState(null);
 
   useEffect(() => {
     if (currentUser) {
@@ -42,8 +43,13 @@ export default function Weight() {
           Authorization: `Bearer ${currentUser.token}`,
         },
       });
-      const data = await res.json();
-      setWeights(sortByDateAscending(data));
+      const data = sortByDateAscending(await res.json());
+      setWeights(data);
+      if (data.length > 0) {
+        setCurrentWeight(data[data.length - 1].weight); // Set the current weight
+      } else {
+        setCurrentWeight(null);
+      }
     } catch (error) {
       console.error("Failed to fetch weights", error);
     }
@@ -69,8 +75,9 @@ export default function Weight() {
           date: adjustedDate.toISOString(),
         }),
       });
-      const data = await res.json();
-      setWeights(sortByDateAscending([...weights, data]));
+      const data = sortByDateAscending([...weights, await res.json()]);
+      setWeights(data);
+      setCurrentWeight(data[data.length - 1].weight); // Update current weight
       setNewWeight("");
       setDate("");
     } catch (error) {
@@ -86,9 +93,15 @@ export default function Weight() {
           Authorization: `Bearer ${currentUser.token}`,
         },
       });
-      setWeights(
-        sortByDateAscending(weights.filter((weight) => weight._id !== id))
+      const updatedWeights = sortByDateAscending(
+        weights.filter((weight) => weight._id !== id)
       );
+      setWeights(updatedWeights);
+      if (updatedWeights.length > 0) {
+        setCurrentWeight(updatedWeights[updatedWeights.length - 1].weight); // Update current weight
+      } else {
+        setCurrentWeight(null);
+      }
     } catch (error) {
       console.error("Failed to delete weight", error);
     }
@@ -132,12 +145,14 @@ export default function Weight() {
   });
 
   useEffect(() => {
-    if (filteredWeights.length > 1) {
+    if (filteredWeights.length > 0) {
       const firstWeight = filteredWeights[0].weight;
       const lastWeight = filteredWeights[filteredWeights.length - 1].weight;
       setWeightChange(lastWeight - firstWeight);
+      setCurrentWeight(lastWeight); // Update current weight
     } else {
       setWeightChange(null);
+      setCurrentWeight(null);
     }
   }, [filteredWeights]);
 
@@ -179,6 +194,7 @@ export default function Weight() {
 
   const weightChangeTextColor =
     weightChange >= 0 ? "text-green-600" : "text-red-600";
+  const currentWeightTextColor = "text-blue-600"; // Set the color for the current weight
 
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 px-4 py-12">
@@ -247,29 +263,33 @@ export default function Weight() {
         {weightChange !== null && (
           <div className="mb-4 text-center">
             <p className={`text-lg font-semibold ${weightChangeTextColor}`}>
-              Total Weight {weightChange >= 0 ? "Gained" : "Lost"}:{" "}
-              {Math.abs(weightChange)} lbs
+              Weight Change: {weightChange >= 0 ? "+" : ""}
+              {weightChange} lbs
             </p>
+            {currentWeight !== null && (
+              <p className={`text-lg font-semibold ${currentWeightTextColor}`}>
+                Current Weight: {currentWeight} lbs
+              </p>
+            )}
           </div>
         )}
-        <div className="grid grid-cols-1 gap-4">
+        <ul className="list-none p-0">
           {weightsAscForList.map((weight) => (
-            <div
+            <li
               key={weight._id}
-              className="flex justify-between items-center bg-white p-4 rounded-lg border border-gray-300 shadow-md"
+              className="flex justify-between bg-white p-4 rounded-lg shadow-md mb-2"
             >
-              <span>
-                {formatDate(weight.date)}: {weight.weight} lbs
-              </span>
+              <span className="text-lg">{formatDate(weight.date)}</span>
+              <span className="text-lg">{weight.weight} lbs</span>
               <button
                 onClick={() => handleDeleteWeight(weight._id)}
-                className="bg-red-500 text-white p-2 rounded-lg transition-transform transform hover:scale-105"
+                className="bg-red-600 text-white p-2 rounded-lg"
               >
                 Delete
               </button>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   );
