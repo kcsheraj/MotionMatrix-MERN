@@ -10,7 +10,6 @@ export default function Dashboard() {
     { id: 5, title: "Explore", path: "/explore" },
   ];
 
-  // Expanded list of motivational quotes
   const quotes = [
     "The only bad workout is the one that didn't happen.",
     "Push yourself because no one else is going to do it for you.",
@@ -37,14 +36,13 @@ export default function Dashboard() {
     "You’re only one workout away from a good mood.",
   ];
 
-  // Function to get a random quote
   const getRandomQuote = () => {
     return quotes[Math.floor(Math.random() * quotes.length)];
   };
 
   return (
-    <div className="flex flex-col items-center h-screen bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300">
-      <div className="px-4 py-12 max-w-7xl w-full">
+    <div className="flex flex-col min-h-screen bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300">
+      <div className="px-4 py-12 max-w-7xl w-full mx-auto">
         <h1 className="text-4xl font-extrabold mb-10 text-gray-900 text-center">
           Dashboard
         </h1>
