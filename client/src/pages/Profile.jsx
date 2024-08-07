@@ -38,6 +38,15 @@ export default function Profile() {
     }
   }, [image]);
 
+  useEffect(() => {
+    if (updateSuccess) {
+      const timer = setTimeout(() => {
+        setUpdateSuccess(false);
+      }, 2000);
+      return () => clearTimeout(timer); // Cleanup timeout if the component unmounts
+    }
+  }, [updateSuccess]);
+
   const handleFileUpload = async (image) => {
     const storage = getStorage(app);
     const fileName = new Date().getTime() + image.name;
@@ -231,9 +240,9 @@ export default function Profile() {
           </span>
         </div>
         <p className="text-red-700 mt-5">{error && "Something went wrong!"}</p>
-        <p className="text-green-700 mt-5">
-          {updateSuccess && "User is updated successfully!"}
-        </p>
+        {updateSuccess && (
+          <p className="text-green-700 mt-5">User is updated successfully!</p>
+        )}
       </div>
 
       {showDeleteModal && (
