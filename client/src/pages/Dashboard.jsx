@@ -7,7 +7,8 @@ export default function Dashboard() {
     { id: 2, title: "PR's", path: "/prs" },
     { id: 3, title: "Weight Tracker", path: "/weight" },
     { id: 4, title: "Workout Routine", path: "/workoutroutine" },
-    { id: 5, title: "Explore", path: "/explore" },
+    { id: 5, title: "Progress Pics", path: "/pics" },
+    { id: 6, title: "Explore", path: "/explore" },
   ];
 
   const quotes = [

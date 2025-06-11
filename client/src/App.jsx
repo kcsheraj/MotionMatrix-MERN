@@ -11,6 +11,7 @@ import CalendarPage from "./pages/CalendarPage";
 import PR from "./pages/PR";
 import Weight from "./pages/Weight";
 import WorkoutRoutine from "./pages/WorkoutRoutine";
+import Pics from "./pages/Pics";
 import Explore from "./pages/Explore";
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/prs" element={<PR />} />
           <Route path="/weight" element={<Weight />} />
           <Route path="/workoutroutine" element={<WorkoutRoutine />} />
+          <Route path="/pics" element={<Pics />} />
           <Route path="/explore" element={<Explore />} />
         </Route>
       </Routes>
