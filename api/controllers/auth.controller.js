@@ -24,7 +24,7 @@ export const signin = async (req, res, next) => {
     if (!validPassword) return next(errorHandler(401, "wrong credentials"));
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
     const { password: hashedPassword, ...rest } = validUser._doc;
-    const expiryDate = new Date(Date.now() + 3600000); // 1 hour
+    const expiryDate = new Date(Date.now() + 10 * 1000); // 10 seconds
     res
       .cookie("access_token", token, { httpOnly: true, expires: expiryDate })
       .status(200)
@@ -40,7 +40,7 @@ export const google = async (req, res, next) => {
     if (user) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       const { password: hashedPassword, ...rest } = user._doc;
-      const expiryDate = new Date(Date.now() + 3600000); // 1 hour
+      const expiryDate = new Date(Date.now() + 10 * 1000); // 10 seconds
       res
         .cookie("access_token", token, {
           httpOnly: true,
@@ -64,7 +64,7 @@ export const google = async (req, res, next) => {
       await newUser.save();
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
       const { password: hashedPassword2, ...rest } = newUser._doc;
-      const expiryDate = new Date(Date.now() + 3600000); // 1 hour
+      const expiryDate = new Date(Date.now() + 10 * 1000); // 10 seconds
       res
         .cookie("access_token", token, {
           httpOnly: true,
@@ -80,4 +80,16 @@ export const google = async (req, res, next) => {
 
 export const signout = (req, res) => {
   res.clearCookie("access_token").status(200).json("Signout success!");
+};
+
+export const verifyToken = (req, res, next) => {
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json({ message: "Unauthorized" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err)
+      return res.status(401).json({ message: "Token expired or invalid" });
+    req.user = user;
+    next();
+  });
 };
