@@ -9,6 +9,7 @@ export default function Pics() {
   const [showGrid, setShowGrid] = useState(false);
   const [editingDateId, setEditingDateId] = useState(null);
   const [editingDateValue, setEditingDateValue] = useState("");
+  const [modalPic, setModalPic] = useState(null); // For modal
 
   // Fetch pics on mount
   useEffect(() => {
@@ -83,8 +84,54 @@ export default function Pics() {
     setEditingDateValue("");
   };
 
+  // Modal close handler
+  const closeModal = () => setModalPic(null);
+
+  // Listen for escape key to close modal
+  useEffect(() => {
+    if (!modalPic) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [modalPic]);
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 overflow-y-auto">
+      {/* Modal */}
+      {modalPic && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80"
+          onClick={closeModal}
+        >
+          <div
+            className="relative max-w-3xl w-full flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-2 right-2 bg-gray-900 bg-opacity-70 text-white rounded-full px-4 py-2 text-lg shadow hover:bg-opacity-90"
+              onClick={closeModal}
+              aria-label="Close"
+            >
+              &times;
+            </button>
+            <img
+              src={modalPic.url}
+              alt="Full Size"
+              className="max-h-[80vh] max-w-full rounded-2xl shadow-2xl"
+              style={{ objectFit: "contain" }}
+            />
+            <span className="mt-4 text-white text-sm">
+              {modalPic.addedAt
+                ? new Date(modalPic.addedAt).toLocaleDateString(undefined, {
+                    timeZone: "UTC",
+                  })
+                : ""}
+            </span>
+          </div>
+        </div>
+      )}
       <div className="px-4 py-12 max-w-5xl w-full flex flex-col items-center">
         <h1 className="text-4xl font-extrabold mb-10 text-gray-900 text-center">
           Progress Pics
@@ -149,8 +196,9 @@ export default function Pics() {
                     <img
                       src={pic.url}
                       alt={`Progress ${idx + 1}`}
-                      className="w-[420px] h-[420px] rounded-2xl shadow-xl object-cover"
+                      className="w-[420px] h-[420px] rounded-2xl shadow-xl object-cover cursor-pointer"
                       style={{ objectFit: "cover" }}
+                      onClick={() => setModalPic(pic)}
                     />
                   ) : (
                     <span className="text-gray-400">No Image</span>
@@ -223,8 +271,9 @@ export default function Pics() {
                     <img
                       src={pic.url}
                       alt={`Progress ${idx + 1}`}
-                      className="w-[320px] h-[320px] rounded-2xl shadow-xl object-cover"
+                      className="w-[320px] h-[320px] rounded-2xl shadow-xl object-cover cursor-pointer"
                       style={{ objectFit: "cover" }}
+                      onClick={() => setModalPic(pic)}
                     />
                   ) : (
                     <span className="text-gray-400">No Image</span>
@@ -288,8 +337,9 @@ export default function Pics() {
                       <img
                         src={pic.url}
                         alt={`Progress ${idx + 1}`}
-                        className="w-[380px] h-[380px] rounded-2xl shadow-xl object-cover"
+                        className="w-[380px] h-[380px] rounded-2xl shadow-xl object-cover cursor-pointer"
                         style={{ objectFit: "cover" }}
+                        onClick={() => setModalPic(pic)}
                       />
                     ) : (
                       <span className="text-gray-400">No Image</span>
