@@ -7,6 +7,7 @@ import routineRoutes from "./routes/routine.route.js"; // Import routine routes
 import calendarRoutes from "./routes/calendar.route.js"; // Import the new calendar routes
 import prRoutes from "./routes/pr.route.js"; // Import PR routes
 import weightRoutes from "./routes/weight.route.js";
+import picRoutes from "./routes/pic.route.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 
@@ -35,6 +36,7 @@ app.use("/api/routine", routineRoutes); // Use routine routes
 app.use("/api/calendar", calendarRoutes); // Use the new calendar routes
 app.use("/api/pr", prRoutes); // Use PR routes
 app.use("/api/weight", weightRoutes);
+app.use("/api/pics", picRoutes);
 
 app.use(express.static(path.join(__dirname, "/client/dist")));
 

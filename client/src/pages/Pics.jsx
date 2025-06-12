@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 export default function Pics() {
@@ -6,13 +6,81 @@ export default function Pics() {
   const [pics, setPics] = useState([]);
   const [showInput, setShowInput] = useState(false);
   const [newPicUrl, setNewPicUrl] = useState("");
-  const [showGrid, setShowGrid] = useState(false); // Toggle for grid/horizontal
+  const [showGrid, setShowGrid] = useState(false);
+  const [editingDateId, setEditingDateId] = useState(null);
+  const [editingDateValue, setEditingDateValue] = useState("");
 
-  const handleAddPic = () => {
+  // Fetch pics on mount
+  useEffect(() => {
+    const fetchPics = async () => {
+      if (!currentUser) return;
+      const res = await fetch("/api/pics", {
+        headers: {
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+      });
+      const data = await res.json();
+      // Sort by most recent first
+      setPics(data.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt)));
+    };
+    fetchPics();
+  }, [currentUser]);
+
+  // Add pic to backend
+  const handleAddPic = async () => {
     if (!newPicUrl) return;
-    setPics([...pics, { url: newPicUrl, addedAt: new Date() }]);
+    const res = await fetch("/api/pics", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${currentUser.token}`,
+      },
+      body: JSON.stringify({ url: newPicUrl }),
+    });
+    const data = await res.json();
+    setPics([data, ...pics]); // Add new pic to the front
     setNewPicUrl("");
     setShowInput(false);
+  };
+
+  // Delete pic from backend
+  const handleDeletePic = async (id) => {
+    if (!window.confirm("Delete this picture?")) return;
+    await fetch(`/api/pics/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${currentUser.token}`,
+      },
+    });
+    setPics(pics.filter((pic) => pic._id !== id));
+  };
+
+  // Edit date for a pic
+  const handleEditDate = (pic) => {
+    setEditingDateId(pic._id);
+    setEditingDateValue(pic.addedAt ? pic.addedAt.slice(0, 10) : "");
+  };
+
+  const handleSaveDate = async (pic) => {
+    if (!editingDateValue) return;
+    const res = await fetch(`/api/pics/${pic._id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${currentUser.token}`,
+      },
+      body: JSON.stringify({ addedAt: editingDateValue }),
+    });
+    const updated = await res.json();
+    setPics((prev) =>
+      prev
+        .map((p) =>
+          p._id === pic._id ? { ...p, addedAt: updated.addedAt } : p
+        )
+        .sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt))
+    );
+    setEditingDateId(null);
+    setEditingDateValue("");
   };
 
   return (
@@ -21,16 +89,16 @@ export default function Pics() {
         <h1 className="text-4xl font-extrabold mb-10 text-gray-900 text-center">
           Progress Pics
         </h1>
-        <div className="flex w-full justify-center items-center gap-4 mb-8">
+        <div className="flex flex-col w-full items-center gap-2 mb-8">
           <div
-            className="w-40 h-40 flex items-center justify-center bg-gray-200 rounded-lg shadow-lg cursor-pointer hover:bg-gray-300 text-5xl text-gray-500"
+            className="w-20 h-20 flex items-center justify-center bg-gray-200 rounded-lg shadow-lg cursor-pointer hover:bg-gray-300 text-3xl text-gray-500"
             onClick={() => setShowInput(true)}
           >
             +
           </div>
-          {/* Desktop only toggle button */}
+          {/* Desktop only toggle button, now smaller and below add */}
           <button
-            className="hidden md:inline-block ml-4 px-6 py-3 bg-gray-800 text-white rounded-lg shadow-lg hover:bg-gray-900 transition"
+            className="hidden md:inline-block mt-2 px-3 py-2 bg-gray-800 text-white rounded-lg shadow-lg hover:bg-gray-900 transition text-sm"
             onClick={() => setShowGrid((prev) => !prev)}
           >
             {showGrid ? "Show Timeline" : "Show Grid"}
@@ -72,27 +140,64 @@ export default function Pics() {
             style={{ maxWidth: "100%" }}
           >
             {pics.map((pic, idx) => (
-              <div key={idx} className="flex flex-col items-center">
+              <div key={pic._id} className="flex flex-col items-center">
                 <div
-                  className="w-[350px] h-[350px] bg-white rounded-xl shadow-xl flex items-center justify-center overflow-hidden mb-2"
-                  style={{ minWidth: 350, minHeight: 350 }}
+                  className="relative"
+                  style={{ minWidth: 420, minHeight: 420 }}
                 >
                   {pic.url ? (
                     <img
                       src={pic.url}
                       alt={`Progress ${idx + 1}`}
-                      className="w-full h-full object-contain"
-                      style={{ imageRendering: "auto" }}
+                      className="w-[420px] h-[420px] rounded-2xl shadow-xl object-cover"
+                      style={{ objectFit: "cover" }}
                     />
                   ) : (
                     <span className="text-gray-400">No Image</span>
                   )}
+                  <button
+                    onClick={() => handleDeletePic(pic._id)}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-3 py-1 text-xs shadow hover:bg-red-700"
+                    title="Delete"
+                  >
+                    Delete
+                  </button>
                 </div>
-                <span className="text-xs text-gray-500">
-                  {pic.addedAt
-                    ? new Date(pic.addedAt).toLocaleDateString()
-                    : ""}
-                </span>
+                {/* Editable date */}
+                {editingDateId === pic._id ? (
+                  <div className="flex items-center gap-2 mt-1">
+                    <input
+                      type="date"
+                      value={editingDateValue}
+                      onChange={(e) => setEditingDateValue(e.target.value)}
+                      className="border rounded px-2 py-1 text-xs"
+                    />
+                    <button
+                      onClick={() => handleSaveDate(pic)}
+                      className="bg-green-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingDateId(null)}
+                      className="bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <span
+                    className="text-xs text-gray-500 cursor-pointer hover:underline mt-1"
+                    onClick={() => handleEditDate(pic)}
+                    title="Edit date"
+                  >
+                    {pic.addedAt
+                      ? new Date(pic.addedAt).toLocaleDateString(undefined, {
+                          timeZone: "UTC",
+                        })
+                      : ""}
+                  </span>
+                )}
                 {idx < pics.length - 1 && (
                   <div className="w-16 h-1 bg-gray-300 rounded-full my-2"></div>
                 )}
@@ -107,57 +212,131 @@ export default function Pics() {
           >
             {pics.map((pic, idx) => (
               <div
-                key={idx}
-                className="flex flex-col items-center mb-8 p-2" // Added padding
+                key={pic._id}
+                className="flex flex-col items-center mb-8 p-2"
               >
                 <div
-                  className="w-[200px] h-[200px] bg-white rounded-xl shadow-xl flex items-center justify-center overflow-hidden mb-2"
-                  style={{ minWidth: 200, minHeight: 200 }} // Reduced size for grid
+                  className="relative"
+                  style={{ minWidth: 320, minHeight: 320 }}
                 >
                   {pic.url ? (
                     <img
                       src={pic.url}
                       alt={`Progress ${idx + 1}`}
-                      className="w-full h-full object-contain"
-                      style={{ imageRendering: "auto" }}
+                      className="w-[320px] h-[320px] rounded-2xl shadow-xl object-cover"
+                      style={{ objectFit: "cover" }}
                     />
                   ) : (
                     <span className="text-gray-400">No Image</span>
                   )}
+                  <button
+                    onClick={() => handleDeletePic(pic._id)}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-3 py-1 text-xs shadow hover:bg-red-700"
+                    title="Delete"
+                  >
+                    Delete
+                  </button>
                 </div>
-                <span className="text-xs text-gray-500">
-                  {pic.addedAt
-                    ? new Date(pic.addedAt).toLocaleDateString()
-                    : ""}
-                </span>
+                {/* Editable date */}
+                {editingDateId === pic._id ? (
+                  <div className="flex items-center gap-2 mt-1">
+                    <input
+                      type="date"
+                      value={editingDateValue}
+                      onChange={(e) => setEditingDateValue(e.target.value)}
+                      className="border rounded px-2 py-1 text-xs"
+                    />
+                    <button
+                      onClick={() => handleSaveDate(pic)}
+                      className="bg-green-500 text-white px-2 py-1 rounded text-xs"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingDateId(null)}
+                      className="bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <span
+                    className="text-xs text-gray-500 cursor-pointer hover:underline mt-1"
+                    onClick={() => handleEditDate(pic)}
+                    title="Edit date"
+                  >
+                    {pic.addedAt
+                      ? new Date(pic.addedAt).toLocaleDateString(undefined, {
+                          timeZone: "UTC",
+                        })
+                      : ""}
+                  </span>
+                )}
               </div>
             ))}
           </div>
           {/* Mobile: vertical, no inner scroll */}
           <div className="flex md:hidden flex-col gap-8 items-center w-full">
             {pics.map((pic, idx) => (
-              <React.Fragment key={idx}>
+              <React.Fragment key={pic._id}>
                 <div className="flex flex-col items-center">
                   <div
-                    className="w-[350px] h-[350px] bg-white rounded-xl shadow-xl flex items-center justify-center overflow-hidden mb-2"
-                    style={{ minWidth: 350, minHeight: 350 }}
+                    className="relative"
+                    style={{ minWidth: 380, minHeight: 380 }}
                   >
                     {pic.url ? (
                       <img
                         src={pic.url}
                         alt={`Progress ${idx + 1}`}
-                        className="w-full h-full object-contain"
-                        style={{ imageRendering: "auto" }}
+                        className="w-[380px] h-[380px] rounded-2xl shadow-xl object-cover"
+                        style={{ objectFit: "cover" }}
                       />
                     ) : (
                       <span className="text-gray-400">No Image</span>
                     )}
+                    <button
+                      onClick={() => handleDeletePic(pic._id)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-3 py-1 text-xs shadow hover:bg-red-700"
+                      title="Delete"
+                    >
+                      Delete
+                    </button>
                   </div>
-                  <span className="text-xs text-gray-500">
-                    {pic.addedAt
-                      ? new Date(pic.addedAt).toLocaleDateString()
-                      : ""}
-                  </span>
+                  {/* Editable date */}
+                  {editingDateId === pic._id ? (
+                    <div className="flex items-center gap-2 mt-1">
+                      <input
+                        type="date"
+                        value={editingDateValue}
+                        onChange={(e) => setEditingDateValue(e.target.value)}
+                        className="border rounded px-2 py-1 text-xs"
+                      />
+                      <button
+                        onClick={() => handleSaveDate(pic)}
+                        className="bg-green-500 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingDateId(null)}
+                        className="bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <span
+                      className="text-xs text-gray-500 cursor-pointer hover:underline mt-1"
+                      onClick={() => handleEditDate(pic)}
+                      title="Edit date"
+                    >
+                      {pic.addedAt
+                        ? new Date(pic.addedAt).toLocaleDateString(undefined, {
+                            timeZone: "UTC",
+                          })
+                        : ""}
+                    </span>
+                  )}
                 </div>
                 {idx < pics.length - 1 && (
                   <div className="w-1 h-16 bg-gray-300 rounded-full my-2"></div>
