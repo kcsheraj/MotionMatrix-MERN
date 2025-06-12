@@ -201,54 +201,46 @@ export default function CalendarPage() {
       </div>
       <style>{`
         .modern-calendar {
-          border-radius: 1rem; /* Increased border-radius for a modern look */
-          border: 1px solid #e5e7eb; /* Light gray border for the calendar */
-          font-family: 'Helvetica Neue', sans-serif; /* Modern font */
-          font-size: 1.25rem; /* Larger font size */
-          width: 100%; /* Full width */
-          max-width: 800px; /* Max width for the calendar */
+          border-radius: 1rem;
+          border: 1px solid #e5e7eb;
+          font-family: 'Helvetica Neue', sans-serif;
+          font-size: 1.25rem;
+          width: 100%;
+          max-width: 800px;
         }
 
-        .react-calendar__navigation__arrow {
-          font-size: 4.5rem; /* Larger arrow size */
-          color: #e5e7eb; /* Gray color for the arrows */
+        .react-calendar__tile {
+          border: 1.5px solid #d1d5db !important; /* Add border to each date */
+          border-radius: 0.5rem;
+          background: #fff;
+          transition: border-color 0.2s;
         }
-
-        .react-calendar__navigation__arrow--prev,
-        .react-calendar__navigation__arrow--next {
-          display: none; /* Hide navigation arrows */
-        }
-
         .react-calendar__tile--active {
-          background-color: #4f5b62; /* Gray background for active dates */
-          color: #ffffff; /* White text for active dates */
-          border-radius: 0.5rem; /* Keep rounded corners */
+          background-color: #4f5b62;
+          color: #ffffff;
+          border-radius: 0.5rem;
+          border: 2px solid #4f5b62 !important; /* Highlight border for active */
         }
         .react-calendar__tile--default {
-          border-radius: 0.5rem; /* Keep rounded corners */
+          border-radius: 0.5rem;
+        }
+        .react-calendar__tile:focus {
+          outline: none;
+          border-color: #6366f1 !important; /* Indigo border on focus */
         }
         .react-calendar__month-view__days {
-          font-size: 1.25rem; /* Larger font size for day names */
+          font-size: 1.25rem;
         }
         .react-calendar__month-view__days__day {
-          height: 3rem; /* Larger day tile height */
-          width: 3rem; /* Larger day tile width */
-          margin: 0.25rem; /* Padding between day tiles */
+          height: 3rem;
+          width: 3rem;
         }
         .react-calendar__month-view__weekdays {
-          font-size: 1.125rem; /* Adjusted font size for weekdays */
-        }
-        .react-calendar__month-view__weekdays__weekday {
-          height: 3rem; /* Larger weekday tile height */
-          width: 3rem; /* Larger weekday tile width */
-        }
-
-        .react-calendar__month-view__weekdays {
-          font-size: 1.125rem; /* Adjusted font size for weekdays */
-          color: #888888; /* Light gray color for weekday names */
+          font-size: 1.125rem;
+          color: #888888;
         }
         .react-calendar {
-          border-radius: 1rem; /* Ensure rounded corners */
+          border-radius: 1rem;
         }
         .glow {
           animation: glow 1s ease-in-out;

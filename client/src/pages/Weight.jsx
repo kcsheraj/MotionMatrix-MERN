@@ -25,8 +25,10 @@ export default function Weight() {
   const [weights, setWeights] = useState([]);
   const [newWeight, setNewWeight] = useState("");
   const [date, setDate] = useState("");
+  // Set filterMonth to "" (all months), filterYear to current year by default
+  const currentYear = new Date().getFullYear();
   const [filterMonth, setFilterMonth] = useState("");
-  const [filterYear, setFilterYear] = useState("");
+  const [filterYear, setFilterYear] = useState(currentYear.toString());
   const [weightChange, setWeightChange] = useState(null);
   const [currentWeight, setCurrentWeight] = useState(null);
 

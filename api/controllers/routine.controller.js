@@ -17,7 +17,10 @@ export const addRoutine = async (req, res, next) => {
 
 export const getRoutines = async (req, res, next) => {
   try {
-    const routines = await Routine.find({ userId: req.user.id });
+    const routines = await Routine.find({ userId: req.user.id }).sort({
+      dayOfWeek: 1,
+      order: 1,
+    });
     res.status(200).json(routines);
   } catch (error) {
     next(error);
@@ -32,6 +35,18 @@ export const deleteRoutine = async (req, res, next) => {
     }
     await routine.deleteOne();
     res.status(200).json("Routine has been deleted...");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateRoutineOrder = async (req, res, next) => {
+  try {
+    const { routines } = req.body; // Array of {_id, order}
+    for (const r of routines) {
+      await Routine.findByIdAndUpdate(r._id, { order: r.order });
+    }
+    res.status(200).json({ message: "Order updated" });
   } catch (error) {
     next(error);
   }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const daysOfWeek = [
   "Monday",
@@ -93,6 +94,66 @@ export default function WorkoutRoutine() {
     return acc;
   }, {});
 
+  const persistOrder = async (day, routinesForDay) => {
+    try {
+      await fetch("/api/routine/order", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${currentUser.token}`,
+        },
+        body: JSON.stringify({
+          routines: routinesForDay.map((r, idx) => ({
+            _id: r._id,
+            order: idx,
+          })),
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to persist order", error);
+    }
+  };
+
+  const onDragEnd = (result) => {
+    const { source, destination } = result;
+    if (!destination) return;
+
+    const sourceDay = source.droppableId;
+    const destDay = destination.droppableId;
+
+    // Clone routines for both days
+    const sourceRoutines = Array.from(groupedRoutines[sourceDay] || []);
+    const destRoutines = Array.from(groupedRoutines[destDay] || []);
+
+    // Moving within the same day
+    if (sourceDay === destDay) {
+      const [removed] = sourceRoutines.splice(source.index, 1);
+      sourceRoutines.splice(destination.index, 0, removed);
+
+      setRoutines((prev) => {
+        const filtered = prev.filter((r) => r.dayOfWeek !== sourceDay);
+        const updated = [...filtered, ...sourceRoutines];
+        persistOrder(sourceDay, sourceRoutines);
+        return updated;
+      });
+    } else {
+      // Moving between days
+      const [removed] = sourceRoutines.splice(source.index, 1);
+      removed.dayOfWeek = destDay;
+      destRoutines.splice(destination.index, 0, removed);
+
+      setRoutines((prev) => {
+        const filtered = prev.filter(
+          (r) => r.dayOfWeek !== sourceDay && r.dayOfWeek !== destDay
+        );
+        const updated = [...filtered, ...sourceRoutines, ...destRoutines];
+        persistOrder(sourceDay, sourceRoutines);
+        persistOrder(destDay, destRoutines);
+        return updated;
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col items-center h-screen bg-gray-100">
       <div className="px-4 py-12 max-w-7xl w-full">
@@ -130,38 +191,60 @@ export default function WorkoutRoutine() {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
-          {daysOfWeek.map((day) => (
-            <div
-              key={day}
-              className={`bg-white p-4 rounded-lg border border-gray-300 ${
-                selectedDay === day ? "border-4 border-gray-800" : ""
-              } shadow-lg transition-transform transform hover:scale-105`}
-              onClick={() => handleDayClick(day)}
-            >
-              <h2 className="text-lg text-gray-800 text-center">{day}</h2>
-              <ul className="list-disc pl-5 mt-2">
-                {(groupedRoutines[day] || []).map((routine) => (
-                  <li
-                    key={routine._id}
-                    className={`mb-2 flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-md ${
-                      selectedDay === day
-                        ? "bg-gray-100 border-2 border-red-500"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      selectedDay === day && handleBulletClick(routine)
-                    }
-                  >
-                    <span className="flex-1 break-words text-gray-800">
-                      {routine.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
+            {daysOfWeek.map((day) => (
+              <div
+                key={day}
+                className={`bg-white p-4 rounded-lg border border-gray-300 ${
+                  selectedDay === day ? "border-4 border-gray-800" : ""
+                } shadow-lg transition-transform transform hover:scale-105`}
+                onClick={() => handleDayClick(day)}
+              >
+                <h2 className="text-lg text-gray-800 text-center">{day}</h2>
+                <Droppable droppableId={day}>
+                  {(provided) => (
+                    <ul
+                      className="list-disc pl-5 mt-2"
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                    >
+                      {(groupedRoutines[day] || []).map((routine, idx) => (
+                        <Draggable
+                          key={routine._id}
+                          draggableId={routine._id}
+                          index={idx}
+                        >
+                          {(provided, snapshot) => (
+                            <li
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`mb-2 flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-md ${
+                                selectedDay === day
+                                  ? "bg-gray-100 border-2 border-red-500"
+                                  : ""
+                              } ${snapshot.isDragging ? "bg-yellow-100" : ""}`}
+                              onClick={() =>
+                                selectedDay === day &&
+                                handleBulletClick(routine)
+                              }
+                            >
+                              <span className="flex-1 break-words text-gray-800">
+                                {routine.text}
+                              </span>
+                            </li>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </ul>
+                  )}
+                </Droppable>
+              </div>
+            ))}
+          </div>
+        </DragDropContext>
       </div>
     </div>
   );
